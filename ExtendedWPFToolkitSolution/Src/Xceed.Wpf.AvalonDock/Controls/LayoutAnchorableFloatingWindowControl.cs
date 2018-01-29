@@ -234,7 +234,7 @@ namespace Xceed.Wpf.AvalonDock.Controls
 
       base.OnClosed( e );
 
-      if( !CloseInitiatedByUser )
+      // if( !CloseInitiatedByUser )
       {
         root.FloatingWindows.Remove( _model );
       }
@@ -246,8 +246,19 @@ namespace Xceed.Wpf.AvalonDock.Controls
     {
       if( CloseInitiatedByUser && !KeepContentVisibleOnClose )
       {
-        e.Cancel = true;
-        _model.Descendents().OfType<LayoutAnchorable>().ToArray().ForEach<LayoutAnchorable>( ( a ) => a.Hide() );
+        //e.Cancel = true;
+        //_model.Descendents().OfType<LayoutAnchorable>().ToArray().ForEach<LayoutAnchorable>( ( a ) => a.Hide() );
+        try
+        {
+          OnExecuteHideWindowCommand( null );
+        }
+        catch (InvalidOperationException)
+        {
+          // If the Hide command causes all anchorables to close, this will try to close the
+          // window (which is not possible when it is already closing).
+        }
+        if ( _model.Descendents().OfType<LayoutAnchorable>().Any() )
+          e.Cancel = true;
       }
 
       base.OnClosing( e );
