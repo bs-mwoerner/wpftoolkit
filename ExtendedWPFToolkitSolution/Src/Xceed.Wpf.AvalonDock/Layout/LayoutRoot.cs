@@ -38,7 +38,10 @@ namespace Xceed.Wpf.AvalonDock.Layout
             LeftSide = new LayoutAnchorSide();
             TopSide = new LayoutAnchorSide();
             BottomSide = new LayoutAnchorSide();
-            RootPanel = new LayoutPanel(new LayoutDocumentPane());
+            if (!DefaultToAnchorable)
+                RootPanel = new LayoutPanel(new LayoutDocumentPane());
+            else
+                RootPanel = new LayoutPanel(new LayoutAnchorablePane());
         }
 
 
@@ -59,7 +62,12 @@ namespace Xceed.Wpf.AvalonDock.Layout
                     _rootPanel = value;
 
                     if (_rootPanel == null)
-                        _rootPanel = new LayoutPanel(new LayoutDocumentPane());
+                    {
+                        if (!DefaultToAnchorable)
+                            _rootPanel = new LayoutPanel(new LayoutDocumentPane());
+                        else
+                            _rootPanel = new LayoutPanel(new LayoutAnchorablePane());
+                    }
 
                     if (_rootPanel != null)
                         _rootPanel.Parent = this;
@@ -437,6 +445,45 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         #endregion
 
+        #region DefaultToAnchorable
+
+        private bool _defaultToAnchorable = false;
+
+        /// <summary>
+        /// Gets or sets a value that defines whether the layout will default to a single document
+        /// pane (false) or a single anchorable pane (true) when it is emptied.
+        /// </summary>
+        public bool DefaultToAnchorable
+        {
+            get { return _defaultToAnchorable; }
+            set
+            {
+                if (value != _defaultToAnchorable)
+                {
+                    RaisePropertyChanging(nameof(DefaultToAnchorable));
+                    _defaultToAnchorable = value;
+
+                    // If the layout is currently empty, reset it.
+                    if (RootPanel.Children.Count == 1)
+                    {
+                        var layoutContainer = RootPanel.Children[0] as ILayoutContainer;
+                        if (layoutContainer != null && layoutContainer.ChildrenCount == 0)
+                        {
+                            RootPanel.Children.RemoveAt(0);
+                            if (!DefaultToAnchorable)
+                                RootPanel.Children.Add(new LayoutDocumentPane());
+                            else
+                                RootPanel.Children.Add(new LayoutAnchorablePane());
+                        }
+                    }
+
+                    RaisePropertyChanged(nameof(DefaultToAnchorable));
+                }
+            }
+        }
+
+        #endregion
+
         #region CollectGarbage
 
         /// <summary>
@@ -473,10 +520,28 @@ namespace Xceed.Wpf.AvalonDock.Layout
                         contentReferencingEmptyPane.PreviousContainerIndex = -1;
                     }
 
-                    //...if this pane is the only documentpane present in the layout than skip it
-                    if (emptyPane is LayoutDocumentPane &&
-                        this.Descendents().OfType<LayoutDocumentPane>().Count(c => c != emptyPane) == 0)
-                        continue;
+                    if (!DefaultToAnchorable)
+                    {
+                        // If this pane is the only document pane present in the layout then skip
+                        // it.
+                        if (emptyPane is LayoutDocumentPane &&
+                            this.Descendents().OfType<LayoutDocumentPane>().Count(
+                                c => c != emptyPane) == 0)
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        // If this pane is the only anchorable pane present in the layout then
+                        // skip it.
+                        if (emptyPane is LayoutAnchorablePane &&
+                            this.Descendents().OfType<LayoutAnchorablePane>().Count(
+                                c => c != emptyPane) == 0)
+                        {
+                            continue;
+                        }
+                    }
 
                     //...if this empty panes is not referenced by anyone, than removes it from its parent container
                     if (!this.Descendents().OfType<ILayoutPreviousContainer>().Any(c => c.PreviousContainer == emptyPane))
@@ -503,7 +568,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 if (!exitFlag)
                 {
                     //removes any empty layout panel
-                    foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutPanel>().Where(p => p.ChildrenCount == 0))
+                    foreach (var emptyPaneGroup in this.Descendents().OfType<LayoutPanel>().Where(
+                        p => p != RootPanel && p.ChildrenCount == 0))
                     {
                         var parentGroup = emptyPaneGroup.Parent as ILayoutContainer;
                         parentGroup.RemoveChild(emptyPaneGroup);
@@ -728,6 +794,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
           {
             Hidden.Add( ( LayoutAnchorable )hiddenObject );
           }
+
+          if( reader.IsStartElement( nameof(DefaultToAnchorable) ) )
+          {
+            if( reader.IsEmptyElement )
+              reader.Skip();
+            else
+              DefaultToAnchorable = reader.ReadElementContentAsBoolean();
+          }
         }
 
         private List<ILayoutPanelElement> ReadRootPanel( XmlReader reader )
@@ -794,7 +868,7 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
           while( true )
           {
-            var result = ReadElement( reader ) as LayoutFloatingWindow;
+            var result = ReadElement( reader );
             if( result == null )
             {
               break;
@@ -851,7 +925,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
               serializer = new XmlSerializer( typeof( LayoutDocumentFloatingWindow ) );
               break;
             case "LayoutAnchorableFloatingWindow":
-              serializer = new XmlSerializer( typeof( LayoutAnchorableFloatingWindow ) );
+            case "LayoutFloatingWindow":
+              serializer = new XmlSerializer(typeof(LayoutAnchorableFloatingWindow),
+                  new XmlRootAttribute(reader.LocalName));
               break;
             case "LeftSide":
             case "RightSide":
@@ -928,7 +1004,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
           writer.WriteStartElement( "Hidden" );
           foreach( var layoutAnchorable in Hidden )
           {
+            writer.WriteStartElement( layoutAnchorable.GetType().Name );
             layoutAnchorable.WriteXml( writer );
+            writer.WriteEndElement();
           }
           writer.WriteEndElement();
         }

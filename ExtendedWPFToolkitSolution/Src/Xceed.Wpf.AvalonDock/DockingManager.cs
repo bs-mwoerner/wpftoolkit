@@ -2991,6 +2991,10 @@ namespace Xceed.Wpf.AvalonDock
                             //((ILogicalChildrenContainer)this).InternalRemoveLogicalChild(itemToRemove.Model as UIElement);
                         }
 
+                        var anchorable = itemToRemove.LayoutElement as LayoutAnchorable;
+                        if (anchorable != null && anchorable.Content != null)
+                            (AnchorablesSource as IList)?.Remove(anchorable.Content);
+
                         itemToRemove.Detach();
                         _layoutItems.Remove(itemToRemove);
 

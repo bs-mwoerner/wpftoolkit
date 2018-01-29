@@ -115,7 +115,9 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 }
             }
 
-            Debug.Fail("Unable to find the side for an element, possible layout problem!");
+            // With the addition of LayoutRoot.DefaultToAnchorable, it is now possible that there
+            // is no parent container with a LayoutDocumentPaneGroup or LayoutDocumentPane.
+            // Debug.Fail("Unable to find the side for an element, possible layout problem!");
             return AnchorSide.Right;
         }
 

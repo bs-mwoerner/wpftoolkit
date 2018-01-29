@@ -200,9 +200,11 @@ namespace Xceed.Wpf.AvalonDock.Layout
             }
 
             XmlSerializer serializer;
-            if( reader.LocalName.Equals("LayoutAnchorablePaneGroup") )
+            if( reader.LocalName.Equals("LayoutAnchorablePaneGroup") ||
+                reader.LocalName.Equals("RootPanel") )
             {
-              serializer = new XmlSerializer( typeof( LayoutAnchorablePaneGroup ) );
+              serializer = new XmlSerializer( typeof( LayoutAnchorablePaneGroup ),
+                  new XmlRootAttribute(reader.LocalName));
             }
             else
             {

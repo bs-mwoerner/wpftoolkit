@@ -34,8 +34,8 @@ namespace Xceed.Wpf.AvalonDock.Layout
 
         [NonSerialized]
         private ILayoutContainer _parent = null;
-        [NonSerialized]
-        private ILayoutRoot _root = null;
+        //[NonSerialized]
+        //private ILayoutRoot _root = null;
         [XmlIgnore]
         public ILayoutContainer Parent
         {
@@ -45,19 +45,19 @@ namespace Xceed.Wpf.AvalonDock.Layout
                 if (_parent != value)
                 {
                     ILayoutContainer oldValue = _parent;
-                    ILayoutRoot oldRoot = _root;
+                    ILayoutRoot oldRoot = Root;
                     RaisePropertyChanging("Parent");
                     OnParentChanging(oldValue, value);
                     _parent = value;
                     OnParentChanged(oldValue, value);
 
-                    _root = Root;
-                    if (oldRoot != _root)
-                        OnRootChanged(oldRoot, _root);
+                    var root = Root as LayoutRoot;
+                    if (oldRoot != root)
+                        OnRootChanged(oldRoot, root);
 
                     RaisePropertyChanged("Parent");
 
-                    var root = Root as LayoutRoot;
+                    //var root = Root as LayoutRoot;
                     if (root != null)
                         root.FireLayoutUpdated();
                 }
