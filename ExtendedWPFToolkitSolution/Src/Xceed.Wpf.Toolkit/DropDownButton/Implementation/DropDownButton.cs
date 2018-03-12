@@ -56,7 +56,7 @@ namespace Xceed.Wpf.Toolkit
       Keyboard.AddKeyDownHandler( this, OnKeyDown );
       Mouse.AddPreviewMouseDownOutsideCapturedElementHandler( this, OnMouseDownOutsideCapturedElement );
       //case 166525 : Do no inherit an implicit style of Button
-      this.InheritanceBehavior = InheritanceBehavior.SkipToThemeNow;
+      //this.InheritanceBehavior = InheritanceBehavior.SkipToThemeNow;
     }
 
     #endregion //Constructors
