@@ -29,8 +29,27 @@ using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Shell;
+using Xceed.Wpf.AvalonDock;
+using Xceed.Wpf.AvalonDock.Controls;
+using Xceed.Wpf.AvalonDock.Converters;
+using Xceed.Wpf.AvalonDock.Layout;
+using Xceed.Wpf.AvalonDock.Themes;
+using Xceed.Wpf.Toolkit;
+using Xceed.Wpf.Toolkit.Chromes;
+using Xceed.Wpf.Toolkit.Core.Converters;
+using Xceed.Wpf.Toolkit.Core.Input;
+using Xceed.Wpf.Toolkit.Core.Media;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 using Xceed.Wpf.Toolkit.LiveExplorer;
 using Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views;
+using Xceed.Wpf.Toolkit.Panels;
+using Xceed.Wpf.Toolkit.Primitives;
+using Xceed.Wpf.Toolkit.PropertyGrid;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using Xceed.Wpf.Toolkit.PropertyGrid.Commands;
+using Xceed.Wpf.Toolkit.PropertyGrid.Converters;
+using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
+using Xceed.Wpf.Toolkit.Zoombox;
 
 
 namespace Xceed.Wpf.Toolkit.LiveExplorer.Samples.Theming.Views {
