@@ -738,6 +738,14 @@ namespace Xceed.Wpf.AvalonDock.Layout
       {
         this.Hidden.Add( ( LayoutAnchorable )hiddenObject );
       }
+
+      if (reader.IsStartElement(nameof(DefaultToAnchorable)))
+      {
+        if (reader.IsEmptyElement)
+          reader.Skip();
+        else
+          DefaultToAnchorable = reader.ReadElementContentAsBoolean();
+      }
     }
 
     public void WriteXml( XmlWriter writer )
@@ -951,14 +959,6 @@ namespace Xceed.Wpf.AvalonDock.Layout
       {
         layoutAnchorSide.Children.Add( las );
       }
-
-          if( reader.IsStartElement( nameof(DefaultToAnchorable) ) )
-          {
-            if( reader.IsEmptyElement )
-              reader.Skip();
-            else
-              DefaultToAnchorable = reader.ReadElementContentAsBoolean();
-          }
     }
 
     private List<ILayoutPanelElement> ReadRootPanel( XmlReader reader, out Orientation orientation )
