@@ -361,7 +361,16 @@ namespace Xceed.Wpf.AvalonDock.Controls
     internal void InternalClose()
     {
       _internalCloseFlag = true;
-      Close();
+      try
+      {
+        Close();
+      }
+      catch (InvalidOperationException)
+      {
+        //Close can throw an InvalidOperationException, when being called while it is closing.
+        //This has happened at least once. I catch the exception here without knowing what
+        //the original cause of this error was.
+      }
     }
 
     #endregion
