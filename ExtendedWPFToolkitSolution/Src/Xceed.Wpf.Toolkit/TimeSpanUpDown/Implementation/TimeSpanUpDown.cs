@@ -271,16 +271,24 @@ namespace Xceed.Wpf.Toolkit
         {
           bool haveDays = separators.First() == '.';
           bool haveMS = ( separators.Count() > 1 ) && ( separators.Last() == '.' );
-
-          result = new TimeSpan( haveDays ? int.Parse( values[ 0 ] ) : 0,  //Days
-                                 haveDays ? int.Parse( values[ 1 ] ) : int.Parse( values[ 0 ] ),  //Hours
-                                 haveDays ? int.Parse( values[ 2 ] ) : int.Parse( values[ 1 ] ),  //Minutes
-                                 ( haveDays && this.ShowSeconds ) ? int.Parse( values[ 3 ] ) : this.ShowSeconds ? int.Parse( values[ 2 ] ) : 0,  //Seconds
-                                 haveMS ? int.Parse( values.Last() ) : 0 );  //Milliseconds
+          try
+          {
+            result = new TimeSpan(haveDays ? int.Parse(values[0]) : 0,  //Days
+                                   haveDays ? int.Parse(values[1]) : int.Parse(values[0]),  //Hours
+                                   haveDays ? int.Parse(values[2]) : int.Parse(values[1]),  //Minutes
+                                   (haveDays && this.ShowSeconds) ? int.Parse(values[3]) : this.ShowSeconds ? int.Parse(values[2]) : 0,  //Seconds
+                                   haveMS ? int.Parse(values.Last()) : 0);  //Milliseconds
+            success = true;
+          }
+          catch (Exception)
+          {
+            //if the parsing went wrong, success stays false.
+          }
         }
       }
 
-      currentValue = result.ToString();
+      if (success)
+        currentValue = result.ToString();
 
       // When text is typed, if UpdateValueOnEnterKey is true, 
       // Sync Value on Text only when Enter Key is pressed.
